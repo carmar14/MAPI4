@@ -1,0 +1,12 @@
+{
+  "train_samples": 2480,
+  "test_samples": 620,
+  "n_epochs": 40,
+  "final_train_loss": 131.16882639238912,
+  "final_val_mse": 276.48658644153227,
+  "test_rmse_joint": [
+    16.29400634765625,
+    3.3154077529907227
+  ],
+  "model_file": "out/phy_nn_2dof.pth"
+}
