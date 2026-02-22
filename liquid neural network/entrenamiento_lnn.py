@@ -15,7 +15,7 @@ def generar_escalones_random(n_segmentos=50, duracion=300):
     valores = np.random.uniform(0.5, 2.0, n_segmentos)
     return np.repeat(valores, duracion)
 
-q_in_signal = generar_escalones_random(80, 300)
+q_in_signal = generar_escalones_random(180, 400)
 #q_in_signal = np.repeat([0.8, 1.2, 0.8, 2.0, 1.5], 700) # Amplitudes variables
 
 # --- 2. Crear objetos ---
@@ -26,11 +26,12 @@ sim = SimulacionNivel(modelo_tanque=mi_tanque, dt=0.01, h0=0.0)
 time, niveles = sim.ejecutar(q_in_signal)
 h = niveles
 #----modelo de lnn-----
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = LiquidTank(2, 20)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-criterion = nn.HuberLoss(delta=1.0)#nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)#, weight_decay=1e-4)
+criterion = nn.MSELoss() #nn.HuberLoss(delta=1.0)
 
-h_state = torch.zeros(1, 10)
+h_state = torch.zeros(1, 20)
 
 epochs = 50
 #loss_history = []
@@ -61,6 +62,10 @@ h_train_norm = (h_train - h_mean) / h_std
 
 q_val_norm = (q_val - q_mean) / q_std
 h_val_norm = (h_val - h_mean) / h_std
+
+patience = 5
+best_val_loss = float("inf")
+counter = 0
 
 for epoch in range(epochs):
     model.train()
@@ -95,13 +100,13 @@ for epoch in range(epochs):
     model.eval()
     val_loss = 0
     h_state_val = torch.zeros(1, 20)
-
+    h_current = torch.tensor([[h_val[0]]], dtype=torch.float32)
     with torch.no_grad():
         for i in range(len(time_val) - 1):
             #q = torch.tensor([[q_val[i]]], dtype=torch.float32)
             q = torch.tensor([[q_val[i], h_val[i]]], dtype=torch.float32)
             target = torch.tensor([[h_val[i + 1]]], dtype=torch.float32)
-
+            h_state_val = h_state_val.detach()
             pred, h_state_val = model(q, h_state_val)
 
             loss = criterion(pred, target)
@@ -110,11 +115,28 @@ for epoch in range(epochs):
 
     print(f"Epoch {epoch} | Train Loss: {total_loss:.4f} | Val Loss: {val_loss:.4f}")
 
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        counter = 0
+        # Guardar mejor modelo
+        torch.save(model.state_dict(), "best_lnn_model.pth")
+
+    else:
+        counter += 1
+        print(f"No improvement for {counter} epochs")
+
+    if counter >= patience:
+        print("Early stopping activated")
+        break
+
 
     #print(f"Epoch {epoch}, Loss: {total_loss}")
 
 h_state = torch.zeros(1, 20)
 predictions = []
+
+model.load_state_dict(torch.load("best_lnn_model.pth"))
+model.eval()
 
 for i in range(len(time)-1):
     q = torch.tensor([[q_in_signal[i], h[i]]], dtype=torch.float32)
