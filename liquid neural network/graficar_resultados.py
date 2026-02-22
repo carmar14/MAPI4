@@ -49,8 +49,8 @@ print("MSE:", mse.item())
 plt.figure(figsize=(10,6))
 
 # Real
-plt.plot(time_train, real_train, label="Real Train", linestyle="-")
-plt.plot(time_val, real_val, label="Real Val", linestyle="--")
+plt.plot(time_train, real_train, label="Ground Truth Train", linestyle="-")
+plt.plot(time_val, real_val, label="Ground Truth Val", linestyle="--")
 
 # Pred
 plt.plot(time_train, pred_train, label="Pred Train", linestyle="-")
@@ -60,9 +60,9 @@ plt.plot(time_val, pred_val, label="Pred Val", linestyle="--")
 plt.axvline(x=time[split_idx], color='gray', linestyle=':', label="Train/Val Split")
 
 plt.legend()
-plt.xlabel("Tiempo")
-plt.ylabel("Nivel h")
-plt.title("Predicción vs Real (Train / Validation)")
+plt.xlabel("Time(seconds)")
+plt.ylabel("Liquid Level (m)")
+plt.title("Prediction vs Ground Truth (Train / Validation)")
 plt.grid(True)
 plt.show()
 '''
