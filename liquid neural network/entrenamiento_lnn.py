@@ -8,6 +8,7 @@ from componentes import Tanque
 from simulacion import SimulacionNivel
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 # --- 1. Configuración de entrada (Escalones) ---
 q_in_signal = np.repeat([0.8, 1.2, 0.8, 2.0, 1.5], 700) # Amplitudes variables
@@ -27,6 +28,7 @@ criterion = nn.MSELoss()
 h_state = torch.zeros(1, 20)
 
 epochs = 50
+loss_history = []
 
 for epoch in range(epochs):
 
@@ -49,6 +51,7 @@ for epoch in range(epochs):
         optimizer.step()
 
         total_loss += loss.item()
+        loss_history.append(total_loss)
 
     print(f"Epoch {epoch}, Loss: {total_loss}")
 
@@ -59,6 +62,20 @@ for i in range(len(time)-1):
     q = torch.tensor([[q_in_signal[i]]], dtype=torch.float32)
     pred, h_state = model(q, h_state)
     predictions.append(pred.item())
+
+# Convertir todo a listas estándar
+results = {
+    "time": time[1:].tolist(),
+    "h_real": h[1:].tolist(),
+    "h_pred": predictions,
+    "loss_history": loss_history
+}
+
+# Guardar archivo
+with open("resultados_lnn.json", "w") as f:
+    json.dump(results, f, indent=4)
+
+print("Resultados guardados en resultados_lnn.json")
 
 plt.plot(time[1:], h[1:], label="Real")
 plt.plot(time[1:], predictions, label="LNN")
