@@ -136,6 +136,8 @@ with open("resultados_lnn.json", "w") as f:
 
 print("Resultados guardados en resultados_lnn.json")
 
+torch.save(model.state_dict(), "liquid_tank_model.pth")
+
 '''
 plt.plot(time[1:], h[1:], label="Real")
 plt.plot(time[1:], predictions, label="LNN")
