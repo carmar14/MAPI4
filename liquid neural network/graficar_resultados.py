@@ -1,8 +1,10 @@
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import json
 import matplotlib.pyplot as plt
 import torch
 
-with open("resultados_lnn_.json", "r") as f:
+with open("resultados_lnn_3.json", "r") as f:
     data = json.load(f)
 
 #train_loss = data["train_loss"]

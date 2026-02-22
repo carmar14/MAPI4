@@ -14,7 +14,7 @@ q_in_signal = generar_escalones_random(180, 400)
 #q_in_signal = np.repeat([0.8, 1.2, 0.8, 2.0, 1.5], 700) # Amplitudes variables
 
 # --- 2. Crear objetos ---
-mi_tanque = Tanque(A=2.5, a=1)
+mi_tanque = Tanque(A=2.5+.1, a=1)
 sim = SimulacionNivel(modelo_tanque=mi_tanque, dt=0.01, h0=0.0)
 
 # --- 3. Resultados simulacion ---
@@ -40,7 +40,7 @@ results = {
 }
 
 # Guardar archivo
-with open("resultados_lnn_.json", "w") as f:
+with open("resultados_lnn_3.json", "w") as f:
     json.dump(results, f, indent=4)
 
 print("Resultados guardados en resultados_lnn.json")
