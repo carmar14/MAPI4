@@ -10,17 +10,18 @@ def generar_escalones_random(n_segmentos=50, duracion=300):
     valores = np.random.uniform(0.5, 2.0, n_segmentos)
     return np.repeat(valores, duracion)
 
-q_in_signal = generar_escalones_random(180, 400)
+q_in_signal = generar_escalones_random(80, 400)
 #q_in_signal = np.repeat([0.8, 1.2, 0.8, 2.0, 1.5], 700) # Amplitudes variables
 
 # --- 2. Crear objetos ---
-mi_tanque = Tanque(A=2.5+.1, a=1)
+mi_tanque = Tanque(A=2.8, a=1)
 sim = SimulacionNivel(modelo_tanque=mi_tanque, dt=0.01, h0=0.0)
 
 # --- 3. Resultados simulacion ---
 time, niveles = sim.ejecutar(q_in_signal)
 h = niveles
 h_state = torch.zeros(1, 20)
+
 predictions = []
 
 model = LiquidTank(2, 20)
