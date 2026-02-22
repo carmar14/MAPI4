@@ -15,7 +15,7 @@ def generar_escalones_random(n_segmentos=50, duracion=300):
     valores = np.random.uniform(0.5, 2.0, n_segmentos)
     return np.repeat(valores, duracion)
 
-q_in_signal = generar_escalones_random(80, 200)
+q_in_signal = generar_escalones_random(80, 300)
 #q_in_signal = np.repeat([0.8, 1.2, 0.8, 2.0, 1.5], 700) # Amplitudes variables
 
 # --- 2. Crear objetos ---
@@ -28,9 +28,9 @@ h = niveles
 #----modelo de lnn-----
 model = LiquidTank(2, 20)
 optimizer = optim.Adam(model.parameters(), lr=0.001)
-criterion = nn.MSELoss()
+criterion = nn.HuberLoss(delta=1.0)#nn.MSELoss()
 
-h_state = torch.zeros(1, 20)
+h_state = torch.zeros(1, 10)
 
 epochs = 50
 #loss_history = []
@@ -63,11 +63,12 @@ q_val_norm = (q_val - q_mean) / q_std
 h_val_norm = (h_val - h_mean) / h_std
 
 for epoch in range(epochs):
-
+    model.train()
     total_loss = 0
     h_state = torch.zeros(1, 20)
 
     for i in range(len(time_train) - 1):
+        optimizer.zero_grad()
         '''
         q = torch.tensor([[q_in_signal[i]]], dtype=torch.float32)
         target = torch.tensor([[h[i + 1]]], dtype=torch.float32)
@@ -83,7 +84,7 @@ for epoch in range(epochs):
 
         loss = criterion(pred, target)
 
-        optimizer.zero_grad()
+        #optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
@@ -92,7 +93,6 @@ for epoch in range(epochs):
     train_loss_history.append(total_loss)
     #validar
     model.eval()
-
     val_loss = 0
     h_state_val = torch.zeros(1, 20)
 
@@ -117,7 +117,7 @@ h_state = torch.zeros(1, 20)
 predictions = []
 
 for i in range(len(time)-1):
-    q = torch.tensor([[q_in_signal[i],h[i]]], dtype=torch.float32)
+    q = torch.tensor([[q_in_signal[i], h[i]]], dtype=torch.float32)
     pred, h_state = model(q, h_state)
     predictions.append(pred.item())
 
