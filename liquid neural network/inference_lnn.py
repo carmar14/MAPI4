@@ -19,7 +19,8 @@ sim = SimulacionNivel(modelo_tanque=mi_tanque, dt=0.01, h0=0.0)
 
 # --- 3. Resultados simulacion ---
 time, niveles = sim.ejecutar(q_in_signal)
-h = niveles
+noise_std = 0.02 * np.std(niveles)   # 2% del desvío estándar de la señal
+h = niveles + np.random.normal(0, noise_std, size=niveles.shape)
 h_state = torch.zeros(1, 20)
 
 predictions = []
@@ -41,7 +42,7 @@ results = {
 }
 
 # Guardar archivo
-with open("resultados_lnn_3.json", "w") as f:
+with open("resultados_lnn_ruido.json", "w") as f:
     json.dump(results, f, indent=4)
 
 print("Resultados guardados en resultados_lnn.json")

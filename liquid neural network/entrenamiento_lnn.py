@@ -24,7 +24,8 @@ sim = SimulacionNivel(modelo_tanque=mi_tanque, dt=0.01, h0=0.0)
 
 # --- 3. Resultados simulacion ---
 time, niveles = sim.ejecutar(q_in_signal)
-h = niveles
+noise_std = 0.02 * np.std(niveles)   # 2% del desvío estándar de la señal
+h = niveles #+ np.random.normal(0, noise_std, size=niveles.shape)
 #----modelo de lnn-----
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = LiquidTank(2, 20)

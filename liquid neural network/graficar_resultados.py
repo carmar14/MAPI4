@@ -4,7 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import torch
 
-with open("resultados_lnn_3.json", "r") as f:
+with open("resultados_lnn_ruido.json", "r") as f:
     data = json.load(f)
 
 #train_loss = data["train_loss"]
