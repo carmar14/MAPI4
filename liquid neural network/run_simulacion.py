@@ -32,7 +32,7 @@ ventana_visualizacion = 100 # Cuántas muestras mostrar a la vez
 
 # --- 1. Configuración de entrada (Escalones) ---
 #q_in = np.repeat([0.8, 1.2],700)#
-q_in = np.repeat([0.8, 1.2, 0.8, 2.0, 1.5], 700) # Amplitudes variables
+q_in = np.repeat([0.8, 1.2, 0.75, 1.18, 1.3, 0.9], 700) # Amplitudes variables, valores por encima de 1.5 se hace mas evidente el error
 
 # --- 2. Crear objetos ---
 mi_tanque = Tanque(A=2.5, a=1)
@@ -40,7 +40,10 @@ sim = SimulacionNivel(modelo_tanque=mi_tanque, dt=0.01, h0=0.0)
 
 # --- 3. Correr y Graficar ---
 tiempo, niveles = sim.ejecutar(q_in)
-
+noise_std = 0.02 * np.std(niveles)   # 2% del desvío estándar de la señal
+niveles = niveles + np.random.normal(0, noise_std, size=niveles.shape)  # 2% del desvío estándar de la señal
+#plt.plot(tiempo, niveles)
+#plt.show()
 u0_sim = q_in[:-1]
 u1_sim = niveles[:-1]
 y_expected = niveles[1:]# Simulación de la salida ideal
