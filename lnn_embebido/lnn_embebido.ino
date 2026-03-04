@@ -29,7 +29,7 @@ void loop() {
       for (int j = 0; j < 20; j++) {
         sum += pgm_read_float(&W_weight[i * 20 + j]) * h[j];
       }
-      //sum += pgm_read_float(&W_bias[i]);
+      sum += pgm_read_float(&W_bias[i]);
       // Mapeo de entrada: U * u + bias_U
       /*
       for (int j = 0; j < 2; j++) {
@@ -39,7 +39,7 @@ void loop() {
       */
       sum += pgm_read_float(&U_weight[i * 2 + 0]) * u0;
       sum += pgm_read_float(&U_weight[i * 2 + 1]) * u1;
-      //sum += pgm_read_float(&U_bias[i]);
+      sum += pgm_read_float(&U_bias[i]);
       dh[i] = (-h[i] + tanh(sum)) / pgm_read_float(&tau[i]);
       //dh[i] = (-h[i] + sum) / pgm_read_float(&tau[i]);
     }
